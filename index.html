@@ -1,11 +1,26 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Control de Gastos Personales</title>
+  <title>📊 Control de Gastos</title>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
+    /* ===== TEMA OSCURO MODERNO ===== */
+    :root {
+      --bg: #121212;
+      --card-bg: #1e1e1e;
+      --text: #e0e0e0;
+      --text-secondary: #aaaaaa;
+      --accent: #00d1b2;
+      --accent-hover: #00a08a;
+      --error: #ff3860;
+      --success: #23d160;
+      --border: #333333;
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
     * {
       margin: 0;
       padding: 0;
@@ -14,9 +29,10 @@
 
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f7f9fc;
-      color: #333;
+      background-color: var(--bg);
+      color: var(--text);
       line-height: 1.6;
+      min-height: 100vh;
     }
 
     .container {
@@ -28,109 +44,150 @@
     header {
       text-align: center;
       margin-bottom: 30px;
-      color: #2c3e50;
     }
 
     header h1 {
       font-size: 2rem;
+      color: var(--accent);
+      font-weight: 600;
     }
 
+    header p {
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+
+    /* Formulario */
     .expense-form {
-      background: white;
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      background: var(--card-bg);
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
       margin-bottom: 30px;
+      border: 1px solid var(--border);
     }
 
     .form-group {
-      margin-bottom: 18px;
+      margin-bottom: 20px;
     }
 
     .form-group label {
       display: block;
-      margin-bottom: 6px;
+      margin-bottom: 8px;
       font-weight: 600;
-      color: #2c3e50;
+      color: var(--text);
     }
 
     .form-group input,
     .form-group select {
       width: 100%;
-      padding: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 14px;
+      background: #2d2d2d;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
       font-size: 1rem;
+      transition: border 0.3s;
     }
 
-    .form-group select:invalid {
-      color: #999;
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: var(--accent);
     }
 
     .btn {
-      background-color: #3498db;
+      background-color: var(--accent);
       color: white;
       border: none;
-      padding: 12px 20px;
-      border-radius: 6px;
+      padding: 14px 24px;
+      border-radius: 8px;
       cursor: pointer;
       font-size: 1rem;
       font-weight: 600;
       transition: background 0.3s;
+      width: 100%;
+      margin-top: 10px;
     }
 
     .btn:hover {
-      background-color: #2980b9;
+      background-color: var(--accent-hover);
     }
 
+    .message {
+      margin-top: 15px;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+    }
+
+    .success {
+      background-color: rgba(35, 209, 96, 0.2);
+      color: var(--success);
+      border: 1px solid rgba(35, 209, 96, 0.3);
+    }
+
+    .error {
+      background-color: rgba(255, 56, 96, 0.2);
+      color: var(--error);
+      border: 1px solid rgba(255, 56, 96, 0.3);
+    }
+
+    /* Dashboard */
     .dashboard {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
       gap: 20px;
       margin-bottom: 30px;
     }
 
     .card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      background: var(--card-bg);
+      padding: 24px;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
     }
 
     .card h3 {
-      margin-bottom: 15px;
-      color: #2c3e50;
-      border-bottom: 2px solid #ecf0f1;
+      margin-bottom: 16px;
+      color: var(--accent);
+      font-size: 1.3rem;
+      border-bottom: 1px solid var(--border);
       padding-bottom: 8px;
     }
 
     .summary-item {
       display: flex;
       justify-content: space-between;
-      margin: 10px 0;
+      margin: 12px 0;
       font-size: 1.1rem;
+      color: var(--text);
     }
 
     .summary-value {
       font-weight: bold;
-      color: #e74c3c;
+      color: var(--error);
     }
 
+    /* Gráfico */
     .chart-container {
       position: relative;
-      height: 300px;
+      height: 280px;
     }
 
+    /* Lista de gastos */
     .expense-list {
       list-style: none;
-      margin-top: 10px;
+      margin-top: 12px;
     }
 
     .expense-item {
       display: flex;
       justify-content: space-between;
-      padding: 12px 0;
-      border-bottom: 1px solid #eee;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
     }
 
     .expense-item:last-child {
@@ -142,57 +199,35 @@
     }
 
     .expense-cat {
-      color: #7f8c8d;
+      color: var(--text-secondary);
       font-size: 0.9rem;
       margin-top: 4px;
     }
 
     .expense-amount {
       font-weight: bold;
-      color: #c0392b;
-    }
-
-    .message {
-      margin-top: 15px;
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 0.95rem;
-    }
-
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
+      color: var(--accent);
     }
 
     @media (max-width: 768px) {
       .dashboard {
         grid-template-columns: 1fr;
       }
-    }
-
-    .expense-app * {
-      -webkit-box-sizing: border-box;
-      -moz-box-sizing: border-box;
-      box-sizing: border-box;
+      .container {
+        padding: 15px;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container expense-app">
+  <div class="container">
     <header>
-      <h1>📊 Control de Gastos Personales</h1>
-      <p>Registra y visualiza tus gastos diarios</p>
+      <h1>📊 Control de Gastos</h1>
+      <p>Registra y visualiza tus finanzas personales</p>
     </header>
 
     <section class="expense-form">
-      <h2>Agregar Nuevo Gasto</h2>
+      <h2>Agregar Gasto</h2>
       <form id="expenseForm">
         <div class="form-group">
           <label for="date">Fecha</label>
@@ -200,7 +235,7 @@
         </div>
         <div class="form-group">
           <label for="description">Descripción</label>
-          <input type="text" id="description" name="description" placeholder="Ej: Compra en supermercado" required />
+          <input type="text" id="description" name="description" placeholder="Ej: Gasolina, comida..." required />
         </div>
         <div class="form-group">
           <label for="category">Categoría</label>
@@ -216,7 +251,7 @@
           </select>
         </div>
         <div class="form-group">
-          <label for="amount">Monto (S/.)</label>
+          <label for="amount">Monto ($)</label>
           <input type="number" id="amount" name="amount" placeholder="0.00" step="0.01" min="0.01" required />
         </div>
         <button type="submit" class="btn">Guardar Gasto</button>
@@ -228,11 +263,11 @@
       <div class="card">
         <h3>Resumen de Hoy</h3>
         <div class="summary-item">
-          <span>Gastos de hoy:</span>
-          <span class="summary-value" id="todayExpenses">S/. 0.00</span>
+          <span>Gastos hoy:</span>
+          <span class="summary-value" id="todayExpenses">$0.00</span>
         </div>
         <div class="summary-item">
-          <span>Número de gastos:</span>
+          <span>N° de gastos:</span>
           <span id="todayCount">0</span>
         </div>
       </div>
@@ -241,10 +276,10 @@
         <h3>Resumen del Mes</h3>
         <div class="summary-item">
           <span>Total mensual:</span>
-          <span class="summary-value" id="monthlyExpenses">S/. 0.00</span>
+          <span class="summary-value" id="monthlyExpenses">$0.00</span>
         </div>
         <div class="summary-item">
-          <span>Número de gastos:</span>
+          <span>N° de gastos:</span>
           <span id="monthlyCount">0</span>
         </div>
       </div>
@@ -260,24 +295,28 @@
     <section class="card">
       <h3>Últimos 10 Gastos</h3>
       <ul class="expense-list" id="expenseList">
-        <li class="expense-item"><span>Sin gastos registrados</span></li>
+        <li class="expense-item"><span style="color:var(--text-secondary)">Sin registros</span></li>
       </ul>
     </section>
   </div>
 
   <script>
-    const GOOGLE_SCRIPT_URL = ''; // Deja vacío si usas solo localStorage
+    // ===== CONFIGURACIÓN =====
+    const STORAGE_KEY = 'gastos_personales_mexico_v3';
+    const GOOGLE_SCRIPT_URL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI'; // 🔴 CAMBIA ESTO
 
     let expenses = [];
     let categoryChart = null;
 
+    // Formatear moneda en pesos mexicanos
     function formatearMoneda(amount) {
-      return new Intl.NumberFormat('es-PE', {
+      return new Intl.NumberFormat('es-MX', {
         style: 'currency',
-        currency: 'PEN'
+        currency: 'MXN'
       }).format(amount);
     }
 
+    // Fecha actual
     function obtenerFechaActual() {
       const today = new Date();
       const year = today.getFullYear();
@@ -286,36 +325,51 @@
       return `${year}-${month}-${day}`;
     }
 
+    // Inicializar fecha
     function inicializarFecha() {
       document.getElementById('date').value = obtenerFechaActual();
     }
 
-    function agregarGasto(event) {
-      event.preventDefault();
+    // Guardar en localStorage
+    function guardarEnLocalStorage() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(expenses));
+      } catch (error) {
+        console.error('Error al guardar en localStorage:', error);
+      }
+    }
+
+    // Cargar desde localStorage
+    function cargarDeLocalStorage() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) {
+            expenses = parsed;
+          }
+        }
+      } catch (error) {
+        console.error('Error al cargar desde localStorage:', error);
+        expenses = [];
+      }
+    }
+
+    // Agregar gasto
+    function agregarGasto(e) {
+      e.preventDefault();
 
       const date = document.getElementById('date').value.trim();
       const description = document.getElementById('description').value.trim();
       const category = document.getElementById('category').value.trim();
       const amount = parseFloat(document.getElementById('amount').value);
 
-      if (!date) {
-        mostrarMensaje('Por favor, ingrese una fecha válida.', 'error');
-        return;
-      }
-      if (!description) {
-        mostrarMensaje('Por favor, ingrese una descripción.', 'error');
-        return;
-      }
-      if (!category) {
-        mostrarMensaje('Por favor, seleccione una categoría.', 'error');
-        return;
-      }
-      if (isNaN(amount) || amount <= 0) {
-        mostrarMensaje('Por favor, ingrese un monto válido mayor a cero.', 'error');
-        return;
-      }
+      if (!date) return mostrarMensaje('⚠️ Fecha requerida.', 'error');
+      if (!description) return mostrarMensaje('⚠️ Describe el gasto.', 'error');
+      if (!category) return mostrarMensaje('⚠️ Selecciona una categoría.', 'error');
+      if (isNaN(amount) || amount <= 0) return mostrarMensaje('⚠️ Monto inválido.', 'error');
 
-      const expense = {
+      const nuevoGasto = {
         id: Date.now(),
         date,
         description,
@@ -323,46 +377,60 @@
         amount
       };
 
-      expenses.unshift(expense);
+      expenses.unshift(nuevoGasto);
       guardarEnLocalStorage();
       actualizarResumen();
       actualizarListaGastos();
-      mostrarMensaje('Gasto registrado correctamente.', 'success');
+      
+      // Enviar a Google Sheets
+      enviarAGoogleSheets(nuevoGasto);
 
-      document.getElementById('expenseForm').reset();
-      document.getElementById('date').value = obtenerFechaActual();
+      mostrarMensaje('✅ Gasto guardado y enviado a Google Sheets.', 'success');
+
+      e.target.reset();
+      inicializarFecha();
     }
 
-    function guardarEnLocalStorage() {
-      try {
-        localStorage.setItem('personalExpenses', JSON.stringify(expenses));
-      } catch (error) {
-        console.error('Error al guardar:', error);
+    // Enviar a Google Sheets
+    async function enviarAGoogleSheets(gasto) {
+      if (GOOGLE_SCRIPT_URL === 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI') {
+        console.warn('❌ Google Apps Script URL no configurada');
+        return;
       }
-    }
 
-    function cargarDeLocalStorage() {
       try {
-        const saved = localStorage.getItem('personalExpenses');
-        if (saved) {
-          expenses = JSON.parse(saved);
+        const response = await fetch(GOOGLE_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'cors',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(gasto)
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
         }
+
+        const result = await response.text();
+        console.log('✅ Enviado a Google Sheets:', result);
       } catch (error) {
-        console.error('Error al cargar:', error);
-        expenses = [];
+        console.error('❌ Error al enviar a Google Sheets:', error);
+        // Aunque falle, el gasto ya está guardado localmente
       }
     }
 
+    // Actualizar resumen
     function actualizarResumen() {
-      const today = obtenerFechaActual();
-      const currentMonth = today.substring(0, 7);
+      const hoy = obtenerFechaActual();
+      const mesActual = hoy.substring(0, 7);
 
-      let todayTotal = 0;
-      let todayCount = 0;
-      let monthlyTotal = 0;
-      let monthlyCount = 0;
+      let totalHoy = 0;
+      let totalMes = 0;
+      let countHoy = 0;
+      let countMes = 0;
 
-      const categoryData = {
+      const datosPorCategoria = {
         'Alimentación': 0,
         'Transporte': 0,
         'Entretenimiento': 0,
@@ -372,26 +440,114 @@
         'Otros': 0
       };
 
-      expenses.forEach(expense => {
-        const expenseDate = expense.date;
-        const expenseMonth = expenseDate.substring(0, 7);
-
-        if (expenseDate === today) {
-          todayTotal += expense.amount;
-          todayCount++;
+      expenses.forEach(g => {
+        if (g.date === hoy) {
+          totalHoy += g.amount;
+          countHoy++;
         }
-
-        if (expenseMonth === currentMonth) {
-          monthlyTotal += expense.amount;
-          monthlyCount++;
-          categoryData[expense.category] += expense.amount;
+        if (g.date.startsWith(mesActual)) {
+          totalMes += g.amount;
+          countMes++;
+          datosPorCategoria[g.category] += g.amount;
         }
       });
 
-      document.getElementById('todayExpenses').textContent = formatearMoneda(todayTotal);
-      document.getElementById('todayCount').textContent = todayCount;
-      document.getElementById('monthlyExpenses').textContent = formatearMoneda(monthlyTotal);
-      document.getElementById('monthlyCount').textContent = monthlyCount;
+      document.getElementById('todayExpenses').textContent = formatearMoneda(totalHoy);
+      document.getElementById('todayCount').textContent = countHoy;
+      document.getElementById('monthlyExpenses').textContent = formatearMoneda(totalMes);
+      document.getElementById('monthlyCount').textContent = countMes;
 
-      crearGrafico(categoryData);
+      crearGrafico(datosPorCategoria);
     }
+
+    // Gráfico
+    function crearGrafico(data) {
+      const ctx = document.getElementById('categoryChart').getContext('2d');
+      const etiquetas = Object.keys(data);
+      const valores = Object.values(data);
+      const colores = ['#ff9a3c', '#64b5f6', '#f06292', '#4db6ac', '#ffb74d', '#81c784', '#90a4ae'];
+
+      const datosFiltrados = etiquetas
+        .map((label, i) => ({ label, value: valores[i] }))
+        .filter(item => item.value > 0);
+
+      if (categoryChart) categoryChart.destroy();
+
+      if (datosFiltrados.length === 0) {
+        datosFiltrados.push({ label: 'Sin datos', value: 1 });
+      }
+
+      categoryChart = new Chart(ctx, {
+        type: 'doughnut',
+         datosFiltrados.map(d => d.value),
+        datasets: [{
+          backgroundColor: datosFiltrados.map((_, i) => colores[i % colores.length]),
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        }
+      }
+    });
+    }
+
+    // Lista de gastos
+    function actualizarListaGastos() {
+      const lista = document.getElementById('expenseList');
+      lista.innerHTML = '';
+
+      const ultimos = expenses.slice(0, 10);
+
+      if (ultimos.length === 0) {
+        const item = document.createElement('li');
+        item.className = 'expense-item';
+        item.innerHTML = '<span style="color:var(--text-secondary)">Sin gastos registrados</span>';
+        lista.appendChild(item);
+        return;
+      }
+
+      ultimos.forEach(g => {
+        const item = document.createElement('li');
+        item.className = 'expense-item';
+        const fecha = new Date(g.date).toLocaleDateString('es-MX');
+        item.innerHTML = `
+          <div class="expense-desc">
+            <strong>${g.description}</strong>
+            <div class="expense-cat">${g.category} • ${fecha}</div>
+          </div>
+          <span class="expense-amount">${formatearMoneda(g.amount)}</span>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    // Mensajes
+    function mostrarMensaje(texto, tipo) {
+      const div = document.getElementById('formMessage');
+      div.textContent = texto;
+      div.className = `message ${tipo}`;
+      setTimeout(() => {
+        div.textContent = '';
+        div.className = '';
+      }, 5000);
+    }
+
+    // ===== INICIALIZACIÓN =====
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarDeLocalStorage();
+      inicializarFecha();
+      document.getElementById('expenseForm').addEventListener('submit', agregarGasto);
+      actualizarResumen();
+      actualizarListaGastos();
+
+      if (expenses.length === 0) {
+        mostrarMensaje('💡 Registra tu primer gasto para comenzar.', 'success');
+      }
+    });
+  </script>
+</body>
+</html>
