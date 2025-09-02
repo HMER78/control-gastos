@@ -303,7 +303,7 @@
   <script>
     // ===== CONFIGURACIÓN =====
     const STORAGE_KEY = 'gastos_personales_mexico_v3';
-    const GOOGLE_SCRIPT_URL = 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI'; // 🔴 CAMBIA ESTO
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz6a_FUi1vufP0NKJ6FWOh1y7DBf36dcctHLEGVouo0QGnU98D83E0cM9QfkzQB9G1slQ/exec'; // 🔴 CAMBIA ESTO
 
     let expenses = [];
     let categoryChart = null;
@@ -393,7 +393,7 @@
 
     // Enviar a Google Sheets
     async function enviarAGoogleSheets(gasto) {
-      if (GOOGLE_SCRIPT_URL === 'TU_URL_DE_GOOGLE_APPS_SCRIPT_AQUI') {
+      if (GOOGLE_SCRIPT_URL === 'Thttps://script.google.com/macros/s/AKfycbz6a_FUi1vufP0NKJ6FWOh1y7DBf36dcctHLEGVouo0QGnU98D83E0cM9QfkzQB9G1slQ/exec') {
         console.warn('❌ Google Apps Script URL no configurada');
         return;
       }
@@ -551,3 +551,4 @@
   </script>
 </body>
 </html>
+
